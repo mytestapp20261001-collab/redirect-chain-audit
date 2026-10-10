@@ -1,0 +1,1 @@
+{"start_url":"https://example.com/a/start","max_redirects":3,"responses":[{"status":302,"location":"../next"},{"status":307,"location":"?page=2"},{"status":200}]}

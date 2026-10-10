@@ -1,0 +1,1 @@
+{"start_url":"https://example.com/start","max_redirects":5,"responses":[{"status":301,"location":"http://other.example/next?token=example-token"},{"status":302,"location":"https://example.com/start"},{"status":200}]}
