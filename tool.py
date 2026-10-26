@@ -241,6 +241,11 @@ def query_marker(value):
 
 def reference(value):
     parts = urlsplit(value)
+    # RFC 3986 path-noscheme forbids a colon in the first relative segment.
+    # urlsplit() alone accepts values such as "1:a" and ":a" as paths.
+    if (not parts.scheme and not parts.netloc and
+            ":" in parts.path.split("/", 1)[0]):
+        raise ValueError("invalid_relative_reference")
     return {"scheme": parts.scheme, "authority": parts.netloc, "path": parts.path,
             "query": parts.query, "fragment": parts.fragment,
             "query_present": query_marker(value), "fragment_present": "#" in value}

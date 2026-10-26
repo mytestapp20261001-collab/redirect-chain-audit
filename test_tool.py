@@ -15,6 +15,32 @@ class AuditTests(unittest.TestCase):
         return tool.audit({"start_url": start, "responses": responses if responses is not None else [{"status": 200}], **extra})
     def codes(self, result):
         return [item["code"] for item in result["findings"]]
+    def test_reject_colon_in_first_relative_segment(self):
+        for location in ("1:a", ":a", "1:a/path?x#y", "9+z:a", "-a:b"):
+            for status in (301, 302, 303, 307, 308):
+                with self.subTest(location=location, status=status):
+                    r = self.run_audit(responses=[{"status": status, "location": location}, {"status": 200}])
+                    self.assertEqual(r["status"], "fail")
+                    self.assertFalse(r["complete"])
+                    self.assertEqual(r["stopped_reason"], "invalid_redirect_target")
+                    self.assertEqual(r["consumed_response_count"], 1)
+                    self.assertEqual(r["redirect_count"], 0)
+                    self.assertEqual(self.codes(r), ["invalid_location_reference"])
+                    self.assertNotIn(location, json.dumps(r))
+
+    def test_preserve_colon_in_valid_relative_references(self):
+        for location in ("./1:a", "/1:a", "x/1:a", "../1:a", "%31%3Aa", "next?x:y", "next#x:y", "//example.com/a:b", "https://example.com/a:b"):
+            with self.subTest(location=location):
+                r = self.run_audit(responses=[{"status": 302, "location": location}, {"status": 200}])
+                self.assertEqual(r["status"], "pass")
+                self.assertTrue(r["complete"])
+                self.assertEqual(r["redirect_count"], 1)
+
+    def test_terminal_location_is_not_validated_as_redirect(self):
+        r = self.run_audit(responses=[{"status": 200, "location": "1:a"}])
+        self.assertEqual(r["status"], "pass")
+        self.assertTrue(r["trace"][0]["location_not_followed"])
+
     def test_terminal(self):
         r = self.run_audit()
         self.assertEqual(r["status"], "pass")

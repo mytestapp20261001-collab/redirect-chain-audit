@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "repository": "mytestapp20261001-collab/redirect-chain-audit",
+  "repository_id": 1413213593,
+  "base_commit": "62de3730db3b06db1420484075ae48e5f73eb9a4",
+  "changes": [
+    {
+      "path": "tool.py",
+      "original_sha256": "b76715f9131bdc4d9c538b9ea79a260e4f4479f8efdea33cc715b00cca9e851a",
+      "current_sha256": "9b5b9f0bde5396dc442d16d1b0b0c73f92a0e554bebe04d0175734e530b464f1",
+      "reason": "Reject malformed path-noscheme Location references while preserving valid colon-bearing references; add regression tests and document bounded behavior."
+    },
+    {
+      "path": "test_tool.py",
+      "original_sha256": "ba37ad9b5f0f89d65c46f7392b0138e1daf7c2f3f55509d8af8a622cc007d005",
+      "current_sha256": "5d2ae9b13d8547d407c6761559a154cc19e60c5083c38a8331e030887d5a46ad",
+      "reason": "Reject malformed path-noscheme Location references while preserving valid colon-bearing references; add regression tests and document bounded behavior."
+    },
+    {
+      "path": "README.md",
+      "original_sha256": "165a1f2fb502680b6313510567e8ce514a6fa3314e90d775b33ba2ac4ff6471c",
+      "current_sha256": "2a0df914f3b2fac8045e9597bf1a18f25044d8c9a1fa67200952ceb0c2550abd",
+      "reason": "Reject malformed path-noscheme Location references while preserving valid colon-bearing references; add regression tests and document bounded behavior."
+    }
+  ],
+  "evidence": {
+    "baseline_tests": 35,
+    "regression_red_subtests": 25,
+    "reference": "https://datatracker.ietf.org/doc/html/rfc3986#section-4.2"
+  },
+  "limitations": [
+    "Offline synthetic traces only; not full URI validation, browser equivalence or SSRF safety.",
+    "Historical migration hashes and experiment guidance unchanged."
+  ]
+}
