@@ -60,6 +60,30 @@ class AuditTests(unittest.TestCase):
     def test_default_port_and_case_equivalence(self):
         r = self.run_audit(responses=[{"status": 302, "location": "https://EXAMPLE.COM:443/next"}, {"status": 200}])
         self.assertEqual(r["status"], "pass")
+    def test_unicode_start_hostname_before_lowercasing(self):
+        for suffix in ("", ":443", ":8443"):
+            r = self.run_audit("https://\u212a.example" + suffix + "/secret-path?secret-query#secret-fragment")
+            self.assertEqual(r["status"], "fail")
+            self.assertEqual(r["findings"], [{"code": "unicode_idna_mapping", "url_index": 0}])
+            self.assertTrue(r["complete"])
+            self.assertNotIn("secret", json.dumps(r))
+    def test_unicode_redirect_hostname_before_lowercasing(self):
+        for location in ("https://\u212a.example/next", "//\u212a.example:443/next"):
+            r = self.run_audit("https://k.example/start", [{"status": 302, "location": location}, {"status": 200}])
+            self.assertEqual(r["findings"], [{"code": "unicode_idna_mapping", "url_index": 1}])
+            self.assertTrue(r["complete"])
+            self.assertEqual(r["redirect_count"], 1)
+            self.assertEqual(r["trace"][0]["target_origin"], "https://k.example:443")
+    def test_unicode_outside_host_does_not_mark_host(self):
+        for start in ("https://K.example/\u212a?q=\u212a#\u212a", "https://[2001:db8::1]/\u212a"):
+            self.assertEqual(self.run_audit(start)["status"], "pass")
+        r = self.run_audit("https://\u212a:private@example.com/")
+        self.assertEqual(self.codes(r), ["userinfo_present"])
+        self.assertNotIn("private", json.dumps(r))
+    def test_unicode_hostname_cli_finding(self):
+        r = self.cli(json.dumps({"start_url": "https://\u212a.example/", "responses": [{"status": 200}]}))
+        self.assertEqual(r.returncode, 1, r.stderr)
+        self.assertEqual(self.codes(json.loads(r.stdout)), ["unicode_idna_mapping"])
     def test_nondefault_port_cross_origin(self):
         r = self.run_audit(responses=[{"status": 302, "location": "https://example.com:8443/next"}, {"status": 200}])
         self.assertIn("cross_origin_redirect", self.codes(r))

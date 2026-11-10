@@ -137,7 +137,11 @@ def inspect_url(value, index, report):
     # Everything emitted below is rebuilt from validated ASCII host/port data.
     if host.endswith("."):
         add("trailing_dot_host")
-    if any(ord(ch) > 127 for ch in host):
+    # hostname lowercases Unicode (for example, U+212A becomes ASCII k).
+    # Inspect the original host spelling, excluding userinfo and port text.
+    raw_host = (authority[1:].partition("]")[0] if authority.startswith("[")
+                else authority.partition(":")[0])
+    if any(ord(ch) > 127 for ch in raw_host):
         add("unicode_idna_mapping")
     host_ascii, kind = None, None
     if authority.startswith("["):

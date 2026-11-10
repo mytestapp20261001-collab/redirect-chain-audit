@@ -41,6 +41,11 @@ def main():
     try:
         receipt = json.loads(receipt_path.read_text()) if receipt_path.exists() else None
         expected = maintenance_hashes(record, receipt)
+        next_path = ROOT / 'docs/MAINTENANCE_2026-11-10.json'
+        if next_path.exists():
+            chain_record = dict(record, preserved_files=[
+                {'path': path, 'sha256': sha} for path, sha in expected.items()])
+            expected = maintenance_hashes(chain_record, json.loads(next_path.read_text()))
     except (ValueError, TypeError, AttributeError, KeyError):
         print(json.dumps({'tool': record['slug'], 'valid': False,
                           'errors': ['invalid maintenance receipt']}))
