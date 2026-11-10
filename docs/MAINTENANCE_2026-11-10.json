@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "repository": "mytestapp20261001-collab/redirect-chain-audit",
+  "repository_id": 1413213593,
+  "base_commit": "6e9abbbeacf22fafe938ae3b5c5335b8d4591b4f",
+  "changes": [
+    {
+      "path": "tool.py",
+      "original_sha256": "9b5b9f0bde5396dc442d16d1b0b0c73f92a0e554bebe04d0175734e530b464f1",
+      "current_sha256": "7246643975725cc2a810056bfb58580092df370e5246dd30193a6ffa2d954629",
+      "reason": "Detect Unicode host spelling before urllib.parse hostname lowercasing while preserving canonical origins, input boundaries, redaction and offline behavior."
+    },
+    {
+      "path": "test_tool.py",
+      "original_sha256": "5d2ae9b13d8547d407c6761559a154cc19e60c5083c38a8331e030887d5a46ad",
+      "current_sha256": "5e2480f844a0dab0d11ccfd4838b720aa5309dbdfafda55859f7c5192c0e9441",
+      "reason": "Detect Unicode host spelling before urllib.parse hostname lowercasing while preserving canonical origins, input boundaries, redaction and offline behavior."
+    },
+    {
+      "path": "README.md",
+      "original_sha256": "2a0df914f3b2fac8045e9597bf1a18f25044d8c9a1fa67200952ceb0c2550abd",
+      "current_sha256": "5bccc461d9f80e916531746d983ac6bd8ea9c2221ba0a2b5ea758a7f5687e372",
+      "reason": "Detect Unicode host spelling before urllib.parse hostname lowercasing while preserving canonical origins, input boundaries, redaction and offline behavior."
+    }
+  ],
+  "evidence": {
+    "reproduced": "U+212A in a hostname lowercases to ASCII k before the old Unicode test; valid HTTPS inputs incorrectly returned pass with zero findings.",
+    "python_versions": [
+      "3.12.14",
+      "3.13.5"
+    ],
+    "reference": "https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlsplit"
+  },
+  "limitations": [
+    "Offline synthetic inputs only; not browser equivalence, exhaustive URI validation or SSRF protection.",
+    "Historical migration hashes, prior maintenance receipts, CI workflow and experiment invitations remain unchanged."
+  ]
+}
